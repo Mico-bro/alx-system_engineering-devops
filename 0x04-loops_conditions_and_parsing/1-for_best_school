@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-# Displays "Holberton School" 10 times using a for loop.
-
-for (( i=0; i<10; i++ )) 
+# is a script that run and repeat 10 times of the string in echo
+for ((i=0; i<=9; i++))
 do
-  echo "best School"
+	echo "best School"
 done
