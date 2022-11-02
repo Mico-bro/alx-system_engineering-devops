@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
-# script run in loop while
-i=0
-while ((i<=9))
+# Displays 'Best School' in stdout 10 times using a while loop
+
+index=0
+
+while [ $index -lt 10 ]
 do
-	echo "best School"
-	((i++))
+  echo "Best School"
+  ((index++))
 done
