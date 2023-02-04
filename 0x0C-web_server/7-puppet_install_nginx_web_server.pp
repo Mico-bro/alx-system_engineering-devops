@@ -1,52 +1,27 @@
-# add stable version of nginx
-exec { 'add nginx stable repo':
-  command => 'sudo add-apt-repository ppa:nginx/stable',
-  path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-}
+#Time to practice configuring your server with Puppet! Just as 
+#you did before, we’d like you to install and configure an Nginx
+#server using Puppet instead of Bash. To save time and effort, you
+#should also include resources in your manifest to perform a 301
+#redirect when querying /redirect_me.
 
-# update software packages list
-exec { 'update packages':
-  command => 'apt-get update',
-  path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-}
 
-# install nginx
+# Install Nginx with puppet
 package { 'nginx':
-  ensure     => 'installed',
+  ensure => installed,
 }
 
-# allow HTTP
-exec { 'allow HTTP':
-  command => "ufw allow 'Nginx HTTP'",
-  path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-  onlyif  => '! dpkg -l nginx | egrep \'îi.*nginx\' > /dev/null 2>&1',
+file_line { 'install':
+  ensure => 'present',
+  path   => '/etc/nginx/sites-available/default',
+  after  => 'listen 80 default_server;',
+  line   => 'rewrite ^/redirect_me https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;',
 }
 
-# change folder rights
-exec { 'chmod www folder':
-  command => 'chmod -R 755 /var/www',
-  path    => '/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin',
-}
-
-# create index file
 file { '/var/www/html/index.html':
-  content => "Hello World!\n",
+  content => 'Holberton School',
 }
 
-# create index file
-file { '/var/www/html/404.html':
-  content => "Ceci n'est pas une page\n",
+service { 'nginx':
+  ensure  => running,
+  require => Package['nginx'],
 }
-
-# add redirection and error page
-file { 'Nginx default config file':
-  ensure  => file,
-  path    => '/etc/nginx/sites-enabled/default',
-  content =>
-"server {
-        listen 80 default_server;
-        listen [::]:80 default_server;
-               root /var/www/html;
-        # Add index.php to the list if you are using PHP
-        index index.html index.htm index.nginx-debian.html;
-
